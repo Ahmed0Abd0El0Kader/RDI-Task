@@ -1,0 +1,117 @@
+{% extends "layouts/b.html" %}
+{% load static %}
+{% load i18n %}
+{% block content %}
+
+<div class="card px-5 py-5 mb-4 w-full">
+    {% if order %}
+    <h2> {% trans "Support was sent to " %}{{order.staff_users.profile.name}} <br> 
+        </h2><br>
+        <div class="justify-between gap-2 px-5 py-5">
+            <h3><a href="tel:{{ order.user.profile.phone  }}">{% trans "Phone" %} : <span style="color: rgb(24, 107, 134);text-decoration:underline; " >{{ order.staff_users.profile.phone  }}</span> </a> </h3>
+            <h3>{% trans "Time" %} : {{ order.created_at }} </h3>
+    
+        </div>  
+        {% if order.status == 'waiting' %}
+                  
+        <div class="flex justify-between">
+            <h3>{% trans "Your Order is waiting for support" %}</h3>
+        </div>
+        
+        {% elif order.status == 'acceptted' %}
+            <div class="flex justify-between">
+                <h3>{% trans " Your Order has been Accepted Support is on the way to your Location " %}</h3>
+                    
+            </div>
+        {% elif order.status == 'arrivetocar' %}
+            <div class="flex justify-between">
+                <p class="text-gray-600 line-through">{% trans "Your Order has been Accepted 
+                    Support is on the way to your Location" %}</p>
+                    <span>✔</span>
+            </div>
+            <div class="flex justify-between">
+                <p class="text-gray-600">{% trans "Support Arrived to the car" %}</p>
+            </div>
+        {% elif order.status == 'complete' %}
+            <div class="flex justify-between">
+                <p class="text-gray-600 line-through">{% trans "Your Order has been Accepted Support is on the way to your Location" %}</p>
+                    <span>✔</span>
+            </div>
+            <div class="flex justify-between ">
+                <p class="text-gray-600 line-through">{% trans "Support Arrived to Location" %}</p>
+                <span>✔</span>
+            </div>
+            <div class="flex justify-between">
+                <p class="text-gray-600">{% trans "Your order is Complete and Your car has been transported" %}</p> <span>✔</span>
+            </div>
+        {% endif %}
+
+    {% endif %}
+</div>
+
+
+  
+<div class="map-container"></div>
+<iframe id="gmap_canvas" width="100%" height="379" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"></iframe>
+
+<style>
+  .map-container {
+    position: relative;
+    width: 100%;
+    padding-bottom: 42.5%;
+    height: 0;
+  }
+  .map-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+</style>
+
+<script>
+  function initMap() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function(position) {
+        const userLat = position.coords.latitude;
+        const userLng = position.coords.longitude;
+
+        // Fetch order location dynamically (replace with your logic)
+        // fetchOrderLocation().then(data => {
+        //   const orderLat = data.latitude;
+        //   const orderLng = data.longitude;
+        //   // ... rest of the code using orderLat and orderLng
+        // });
+
+        // Placeholder order location (remove if using dynamic fetching)
+        var orderLat = {{order.latitude}} ;
+        var orderLng = {{order.longitude}} ;
+        //const orderLat = 29.0804;
+        //const orderLng = 31.0962;
+
+        const mapSrc = `https://www.google.com/maps/embed/v1/directions?key=AIzaSyBaePz46NrcgLDOVLBuGWSGpt_06lzoATg&origin=${userLat},${userLng}&destination=${orderLat},${orderLng}&mode=driving`;
+
+        document.getElementById("gmap_canvas").src = mapSrc;
+      }, function(error) {
+        console.error("Geolocation error:", error);
+        // Handle location access denied (e.g., display message)
+      });
+    } else {
+      alert("Geolocation is not supported by this browser.");
+    }
+  }
+
+  // Initialize the map when the page loads
+  window.onload = initMap;
+</script>
+
+<script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBaePz46NrcgLDOVLBuGWSGpt_06lzoATg"></script>
+
+
+
+
+
+
+  
+{% endblock content %}

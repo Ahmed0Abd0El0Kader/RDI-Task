@@ -1,0 +1,46 @@
+{% extends "layouts/d.html" %}
+{% load i18n %}
+
+
+{% block content %}
+  
+<div id="profile" class="flex flex-col items-center">
+    
+    <div class="w-full md:w-[36rem] lg:w-[50rem] relative">
+        <div class="card p-6">
+            <div class="absolute top-0 right-0 mt-2 mr-5 ">
+                <a href="{% url 'profile-edit' %}" class="text-gray-500 hover:underline"> {% trans "Edit Profile" %} </a>
+            </div>
+            <div class="text-center flex flex-col items-center">
+                <img class="w-36 h-36 rounded-full object-cover mb-4" src="{{profile.avatar}}" />
+                <div class="text-center max-w-md">
+                    <h1>{{profile.name}}</h1>
+                    <div class="text-gray-400 mb-2 -mt-3">@{{profile.user.username}}</div>
+                    <div class="flex items-center justify-center mx-auto">
+                        <img class="object-cover h-6 mr-1 opacity-60" src="https://img.icons8.com/material-outlined/50/000000/marker.png"> 
+                        {% if profile.location %}
+                        {{profile.location}}
+                        {% else %}
+                        {% trans "El Riyadh" %}
+                        {% endif %}
+                    </div>
+                    <div class="my-8">
+                        {% if profile.bio %}
+                        {{profile.bio}}
+                        {% endif %}
+                    </div> 
+                    <div class="my-8">
+                        {% if profile.user.plan %}
+                        <h3 class="px-3">{% trans "Plan" %} : {{request.user.plan.sub.name}} &nbsp; <span class="text-sm text-gray-500 "><a href="{% url 'user_plan' %}">{% trans "Change It" %}</a></span></h3>
+                        {% elif user.is_staff %}
+                        {% else %}
+                        {% trans "No Plan" %} &nbsp; <span class="text-sm text-gray-500 "><a href="{% url 'home' %}">{% trans "Choose Plan" %} </a></span>
+                        {% endif %}
+                    </div> 
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock content %}

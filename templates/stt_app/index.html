@@ -1,0 +1,52 @@
+{% extends "layouts/a.html" %}
+{% block content %}
+<div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+    <h2 class="text-xl font-bold mb-4">Upload Audio</h2>
+    <form id="uploadForm" method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <input 
+        type="file" 
+        name="file" 
+        accept="audio/*"
+        class="block w-full text-sm text-gray-900 border rounded-lg cursor-pointer bg-gray-50 focus:outline-none"
+        required>
+      <button 
+        type="submit" 
+        class="mt-4 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded focus:outline-none focus:ring focus:ring-blue-300">
+        Upload
+      </button>
+    </form>
+    <div id="result" class="mt-4 text-gray-700"></div>
+  </div>
+  
+  <script>
+    document.getElementById('uploadForm').addEventListener('submit', async function(event) {
+      event.preventDefault();
+  
+      const formData = new FormData(this);
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerText = 'Processing...';
+  
+      try {
+        const response = await fetch("{% url 'upload_audio' %}", {
+          method: 'POST',
+          body: formData,
+        });
+  
+        const result = await response.json();
+        if (response.ok && result.transcription) {
+          resultDiv.innerText = `Transcription: ${result.transcription}`;
+          resultDiv.classList.remove('text-red-500');
+          resultDiv.classList.add('text-green-500');
+        } else {
+          throw new Error(result.error || 'An unknown error occurred.');
+        }
+      } catch (error) {
+        resultDiv.innerText = `Error: ${error.message}`;
+        resultDiv.classList.remove('text-green-500');
+        resultDiv.classList.add('text-red-500');
+      }
+    });
+  </script>
+  
+{% endblock content %}

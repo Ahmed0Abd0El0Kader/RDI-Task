@@ -1,0 +1,14 @@
+{% if error %}
+    <p style="color: red;">{{ error }}</p>
+{% endif %}
+
+{% if task.active %}
+    <!-- Button to mark the task as done -->
+    <button id="mark-done-btn" hx-post="{% url 'mark-done-task' %}" hx-target="#task-container" _="on click remove me">
+        Mark as Done
+    </button>
+{% else %}
+    <button id="create-task-btn" hx-post="{% url  'create-task' %}" hx-target="#task-container" _="on click remove me">
+        Create Task
+    </button>
+{% endif %}

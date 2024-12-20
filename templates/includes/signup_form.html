@@ -1,0 +1,7 @@
+{% load static %}
+{% load i18n %}
+<form action="{% url 'load_form' %}" method="POST" class="p-6">
+    {% csrf_token %}
+    {% include "includes/form.html" %}
+    <button type="submit" class="button"> {% trans "Submit" %} </button>
+</form>

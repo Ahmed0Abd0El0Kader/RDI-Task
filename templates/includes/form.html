@@ -1,0 +1,144 @@
+{% load widget_tweaks %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        .form-label {
+            font-size: 1rem;
+        }
+        .form-field {
+            font-size: 1rem;
+        }
+        .form-radio {
+            width: 1rem;
+            height: 1rem;
+        }
+        .form-checkbox {
+            width: 1rem;
+            height: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    {% if forms %}
+        <!-- Handle multiple forms -->
+        {% for form in forms %}
+
+            {% if form.non_field_errors %}
+                <div class="mb-8 bg-red-100 text-red-700 border border-red-300 rounded p-4">
+                    {% for error in form.non_field_errors %}
+                        <p class="mb-0 text-lg">{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% for field in form %}
+                {% if field.is_hidden %}
+                    {{ field }} <!-- Render hidden fields directly -->
+                {% else %}
+                    <div class="my-8">
+                        <label for="{{ field.id_for_label }}" class="block mb-2 text-lg font-semibold text-gray-900 dark:text-white">
+                            {{ field.label }}
+                        </label>
+
+                        <div>
+                            {% if field.field.widget.input_type == "radio" %}
+                                <div class="flex gap-6">
+                                    {% for radio in field %}
+                                        <div>
+                                            {% if form.is_bound and radio.errors %}
+                                                {% render_field radio class="form-radio border-red-500 focus:ring-2 focus:ring-red-500" %}
+                                            {% else %}
+                                                {% render_field radio class="form-radio border-green-500 focus:ring-2 focus:ring-green-500" %}
+                                            {% endif %}
+                                            <label for="{{ radio.id_for_label }}" class="ml-2">{{ radio.choice_label }}</label>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {% if form.is_bound and field.errors %}
+                                    {% render_field field class="bg-red-50 border border-red-500 text-red-900 placeholder-red-700 text-lg rounded p-4 w-full focus:ring-red-500 focus:border-red-500" %}
+                                    {% for error in field.errors %}
+                                        <p class="mt-1 text-lg text-red-600">{{ error }}</p>
+                                    {% endfor %}
+                                {% else %}
+                                    {% render_field field class="bg-gray-100 border border-gray-300 text-lg text-gray-900 rounded p-4 w-full focus:ring-blue-500 focus:border-blue-500" %}
+                                {% endif %}
+                            {% endif %}
+
+                            {% if field.name == "image" and form.instance.pk and form.instance.image %}
+                                <div class="mt-4">
+                                    <p class="text-lg text-gray-700 dark:text-gray-300">الصورة الحالية:</p>
+                                    <img src="{{ form.instance.image.url }}" alt="Uploaded Image" class="max-w-full h-auto mt-4 rounded" style="max-width: 150px;">
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+    {% elif form %}
+        <!-- Handle single form -->            
+            {% if form.non_field_errors %}
+                <div class="mb-8 bg-red-100 text-red-700 border border-red-300 rounded p-4">
+                    {% for error in form.non_field_errors %}
+                        <p class="mb-0 text-lg">{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% for field in form %}
+                {% if field.is_hidden %}
+                    {{ field }}
+                {% else %}
+                    <div class="my-8">
+                        <label for="{{ field.id_for_label }}" class="block mb-2 text-lg font-semibold text-gray-900 dark:text-white">
+                            {{ field.label }}
+                        </label>
+
+                        <div>
+                            {% if field.field.widget.input_type == "radio" %}
+                                <div class="flex gap-6">
+                                    {% for radio in field %}
+                                        <div>
+                                            {% if form.is_bound and radio.errors %}
+                                                {% render_field radio class="form-radio border-red-500 focus:ring-2 focus:ring-red-500" %}
+                                            {% else %}
+                                                {% render_field radio class="form-radio border-green-500 focus:ring-2 focus:ring-green-500" %}
+                                            {% endif %}
+                                            <label for="{{ radio.id_for_label }}" class="ml-2">{{ radio.choice_label }}</label>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {% if form.is_bound and field.errors %}
+                                    {% render_field field class="bg-red-50 border border-red-500 text-red-900 placeholder-red-700 text-lg rounded p-4 w-full focus:ring-red-500 focus:border-red-500" %}
+                                    {% for error in field.errors %}
+                                        <p class="mt-1 text-lg text-red-600">{{ error }}</p>
+                                    {% endfor %}
+                                {% else %}
+                                    {% render_field field class="bg-gray-100 border border-gray-300 text-lg text-gray-900 rounded p-4 w-full focus:ring-blue-500 focus:border-blue-500" %}
+                                {% endif %}
+                            {% endif %}
+
+                            {% if field.name == "image" and form.instance.pk and form.instance.image %}
+                                <div class="mt-4">
+                                    <p class="text-lg text-gray-700 dark:text-gray-300">الصورة الحالية:</p>
+                                    <img src="{{ form.instance.image.url }}" alt="Uploaded Image" class="max-w-full h-auto mt-4 rounded" style="max-width: 150px;">
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+    {% else %}
+        <div>No forms available.</div>
+    {% endif %}
+</body>
+
+</html>

@@ -1,0 +1,12 @@
+
+{% extends "layouts/d.html" %}
+{% block content %}
+{% load i18n %}
+<div class="text-center mt-8 mb-8">
+    <h1>{% trans "Page not found" %}</h1>
+    <p class="my-6 mb-8"><b>
+        {% trans "This page doesn't exist or is unavailable Please Call Us " %}
+     </b></p>
+    <a class="button" href="{% url 'custom_redirect' %}">{% trans "Go Back to Home" %}</a>
+</div>
+{% endblock content %}

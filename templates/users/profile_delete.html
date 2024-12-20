@@ -1,0 +1,14 @@
+{% extends "layouts/c.html" %}
+{% load i18n %}
+
+
+{% block content %}
+<h1>{% trans "Delete Account" %}</h1>
+<p>{% trans "Are you sure you want to delete your account?" %}</p>
+
+<form method='POST'>
+    {% csrf_token %}
+    <button type="submit" class="btn-red mt-6">{% trans "Yes, I want to delete my account" %}</button>
+    <a class="button secondaryAction ml-1" href="{{ request.META.HTTP_REFERER }}">{% trans "Cancel" %}</a>
+</form>
+{% endblock content %}

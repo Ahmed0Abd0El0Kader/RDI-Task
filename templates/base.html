@@ -1,0 +1,566 @@
+{% load static %}
+{% load i18n %}
+{% get_current_language as LANGUAGE_CODE %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}" dir="{% if LANGUAGE_CODE == 'ar' %}rtl{% else %}ltr{% endif %}">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <title style="font-family:'Amiri', serif; ">{% trans 'RDI Task' %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+    <script src="https://unpkg.com/htmx.org@2.0.2"></script>
+    <script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&display=swap" rel="stylesheet">
+    <!-- location -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
+    <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <!-- <script src="https://sa.myfatoorah.com/payment/v1/session.js"></script> -->
+
+    <style type="text/tailwindcss">
+
+        @import url(https://fonts.googleapis.com/earlyaccess/amiri.css);
+        [x-cloak] { 
+            display: none !important; 
+        }
+        :root {
+            --primary: #2751a3;
+            --primary-hover: #1a2f58;
+            --black: #1f2937;
+            --font1: 'Lobster', sans-serif;
+        }
+        #map {
+            height: 400px; /* Set the height of the map */
+            width: 100%;
+        }
+            
+        .cairo-font {
+            font-family: "Cairo", sans-serif;
+            font-optical-sizing: auto;
+            font-weight: 400;
+            font-style: normal;
+            font-variation-settings:
+            "slnt" 0;
+        }
+        .hero-text{
+            font-family: "Cairo", sans-serif;
+            font-optical-sizing: auto;
+            font-weight: 400;
+            font-style: normal;
+            font-variation-settings:
+            "slnt" 0;
+            color: var(--primary);
+            text-align: center;
+            text-shadow: 
+            0 0 3px #fff, 
+            0 0 3px #fff, 
+            0 0 3px #fff, 
+            0 0 3px #fff, 
+            0 0 3px #fff, 
+            0 0 3px #fff, 
+            0 0 3px #fff, 
+            0 0 3px #fff, 
+            0 0 3px #fff, 
+            0 0 3px #fff, 
+            0 0 3px #fff, 
+            0 0 3px #fff, 
+            0 0 3px #fff;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+          
+        h1 {
+            @apply text-4xl font-bold mb-4 ;
+
+        }
+        h2 {
+            @apply text-2xl font-bold mb-3
+        }
+        h3 {
+            @apply text-lg font-bold 
+        }
+        .font1 {
+            font-family: var(--font1);
+        }
+        .button, button, [type='submit'], [type='button'] {
+            display: inline-flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            text-align: center;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            padding: 0 1rem;
+            min-height: 3.3rem;
+            font-weight: 600;
+            box-shadow: 0 4px 3px rgba(0, 0, 0, 0.1);
+            transition-property: transform;
+            transition-duration: .2s;
+            color: white;
+            background-color: var(--primary);
+            width: fit-content;
+        }
+        .button:hover, button:hover, [type='submit']:hover, [type='button']:hover {
+            background-color: var(--primary-hover);
+        }
+        .button:active, button:active, [type='submit']:active, [type='button']:active {
+            transform: scale(0.95);
+        }
+        .button-outline, button.button-outline, [type='submit'].button-outline, [type='button'].button-outline {
+            display: inline-flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            text-align: center;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            padding: 0 1rem;
+            min-height: 3.3rem;
+            font-weight: 600;
+            box-shadow: 0 4px 3px rgba(0, 0, 0, 0.1);
+            transition-property: transform, background-color, color, border-color;
+            transition-duration: .2s;
+            color: white; /* Text color */
+            background-color: transparent; /* Transparent background */
+            border: 2px solid var(--primary); /* Border color */
+            width: fit-content;
+        }
+        
+        .button-outline:hover, button.button-outline:hover, [type='submit'].button-outline:hover, [type='button'].button-outline:hover {
+            background-color: var(--primary-hover); /* Background on hover */
+            color: white; /* Text color on hover */
+            border-color: var(--primary-hover); /* Border color on hover */
+        }
+        
+        .button-outline:active, button.button-outline:active, [type='submit'].button-outline:active, [type='button'].button-outline:active {
+            transform: scale(0.95);
+        }
+        
+        .secondaryAction {
+            background-color: white;
+            color: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(0, 0, 0, 0.3);
+        }
+        .secondaryAction:hover, .button.secondaryAction:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+        .navitems>li>a {
+            @apply flex items-center gap-2 h-12 px-4 hover:bg-[--primary] rounded-lg;
+        }
+        .card {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            background-color: white;
+            padding-bottom: 1rem;
+            width: 100%;
+            transform: translateY(100px); /* Start slightly below the view */
+            opacity: 0; /* Start fully transparent */
+            transition: transform 1s ease-in-out, opacity 1s ease-in-out;
+        }
+        .card.loaded {
+            transform: translateY(0); /* Move to original position */
+            opacity: 1; /* Fade in */
+          }
+        .hoverlist>* {
+            @apply hover:bg-[--primary-hover] rounded-md transition duration-150;
+        }
+        .hoverlist>*>a {
+            @apply flex items-center p-2;
+        }
+        .highlight {
+            @apply !bg-indigo-100;
+        }
+        .titleBlip {
+            animation: 1s fadeIn;
+        }
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            10% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        html, body {
+            margin: 0;
+            min-height: 100%;
+
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+        form p {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        label, input {
+          display: inline-block;
+        }
+        form p label {
+            width: 7rem;
+            }
+        label {
+            margin: 6px 0 3px;
+        }
+        input, textarea {
+            width: 100%;
+        }
+        input[type="file"], select {
+            background-color: white;
+            padding-left: 0;
+        }
+        label[for="id_remember"] {
+            width: auto;
+            margin-right: 0.5rem;
+        }
+        input[name="remember"] {
+            width: auto;
+        }
+        .btn-red {
+            @apply inline-flex bg-red-500;
+        }
+        .btn-red:hover {
+            @apply bg-red-600;
+        }
+        .login .secondaryAction {
+            box-shadow: none;
+            display: block;
+            padding: none;
+            padding: 0px;
+            border: none;
+            font-size: smaller;
+            font-weight: normal;
+            min-height: auto;
+            margin-bottom: 1.5rem;
+        }
+        .login .secondaryAction:hover {
+            @apply text-gray-500 underline bg-white;
+        }
+        #id_tags {
+            margin-bottom: 1rem;
+        }
+        #id_tags div {
+            display: inline-block;
+            margin-right: 0.5rem;  
+        }
+        #id_tags div label {
+            border-radius: 9999px;
+            padding: 0.5rem 1rem;
+            border: 1px solid rgb(229 231 235);
+            width: auto;
+            cursor: pointer;
+            user-select: none;
+        }
+        #id_tags input {
+            display: none;
+        }
+        #id_tags label:has(input:checked) {
+            background-color: var(--black);
+            color: white;
+            border: 1px solid var(--black);
+        }
+        .textarea, textarea {
+            margin-bottom: 1rem;
+        }
+        .textarea, textarea, input {
+            border-radius: 0.5rem;
+            padding: 1rem 1.2rem;
+            background-color: rgba(232, 240, 254, 1);
+        }
+        .errorlist li {
+            color: rgb(253, 88, 49);
+            padding: 0.5rem;
+            padding-left: 1rem;
+            border-left: 5px solid rgb(253, 88, 49);
+            margin-bottom: 1rem;
+        }
+        .tab {
+            cursor: pointer;
+            padding: 0.75rem 1rem;
+            color: rgb(0,0,0,0.6); 
+            background-color: rgb(0,0,0,0.05);
+            border-radius: 0.75rem;
+            text-align: center;
+            display: flex;
+            align-items: center;
+        }
+        .tab:hover {
+            background-color: rgb(0,0,0,0.1);
+        }
+        .tab.selected {
+            color: white;
+            background-color: var(--black);
+        }
+        .replyform {
+            border-top: none;
+        }
+        .replyform textarea, .replyform input {
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            margin-bottom: 0px;
+            height: 3.2rem;
+        }
+        .replyform button {
+            margin-left: 0.5rem;
+            min-height: unset;
+        }
+        .fade-me-in.htmx-settling{
+            opacity: 0;
+        }
+        .fade-me-in {
+            opacity: 1;
+            transition: opacity 1s ease-out;
+        }
+        #profile article figure img {
+            @apply aspect-[3/2] object-cover;
+        }
+        #profile article p {
+            @apply truncate leading-normal;
+        }
+        .fade-in {
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+      
+            .fade-in.loaded {
+            opacity: 1;
+            }
+            .fa {
+            padding: 20px;
+            font-size: 30px;
+            width: 50px;
+            text-align: center;
+            text-decoration: none;
+            margin: 5px 2px;
+            justify-content: center;
+            justify-items: auto;
+            }
+            
+            .fa:hover {
+                opacity: 0.7;
+            }
+            .social {
+            display: inline-block;
+            position:absolute;
+            top:50%;
+            left:50%;
+            -ms-transform:translate(-50%,-50%);
+            -webkit-transform:translate(-50%,-50%);
+            transform:translate(-50%,-50%);
+            
+            
+            /* Icons */
+            
+            a {
+            color:#fff;
+            background: #DB6E82;
+            border-radius:4px;
+            text-align:center;
+            text-decoration:none;
+            font-family:fontawesome;
+            position: relative;
+            display: inline-block;
+            width:40px;
+            height:28px;
+            padding-top:12px;
+            margin:0 2px;
+            -o-transition:all .5s;
+            -webkit-transition: all .5s;
+            -moz-transition: all .5s;
+            transition: all .5s;
+                -webkit-font-smoothing: antialiased;
+            }
+            
+            a:hover {
+            background: #ef92a3;
+            }
+            
+            /* pop-up text */
+            
+            a span {
+            color:#666;
+            position:absolute;
+            font-family:sans-serif;
+            bottom:0;
+            left:-25px;
+            right:-25px;
+            padding:5px 7px;
+            z-index:-1;
+            font-size:14px;
+            border-radius:2px;
+            background:#fff;
+            visibility:hidden;
+            opacity:0;
+            -o-transition:all .5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            -webkit-transition: all .5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            -moz-transition: all .5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            transition: all .5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            }
+            
+            /* pop-up text arrow */
+            
+            a span:before {
+            content:'';
+            width: 0; 
+            height: 0; 
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 5px solid #fff;
+            position:absolute;
+            bottom:-5px;
+            left:40px;
+            }
+            
+            /* text pops up when icon is in hover state */
+            
+            a:hover span {
+            bottom:50px;
+            visibility:visible;
+            opacity:1;
+            }
+            
+            /* font awesome icons */
+            
+            a:nth-of-type(1):before {
+            content:'\f09a';
+            }
+            a:nth-of-type(2):before {
+            content:'\f099';
+            }
+            a:nth-of-type(3):before {
+            content:'\f0d5';
+            }
+            a:nth-of-type(4):before {
+            content:'\f113';
+            }
+            a:nth-of-type(5):before {
+            content:'\f17d';
+            }
+            a:nth-of-type(6):before {
+            content:'\f1cb';
+            }
+        }
+
+        hero {
+            background-size: 50%; /* Reduce the image size to 50% */
+            background-position: center; /* Center the image */
+            
+        }
+
+        /* Media query for smaller screens */
+        @media (max-width: 768px) {
+            hero {
+                background-size: 100%; /* Increase the size for mobile responsiveness */
+                background-position: top; /* Adjust the position for better view */
+            }
+
+            h1 {
+                font-size: 3rem; /* Make the text smaller on smaller screens */
+            }
+        }
+        @import url(https://fonts.bunny.net/css?family=alata:400);
+
+
+    </style>
+    <script>
+        // Wait for the window to fully load before applying the transition
+        window.addEventListener('load', () => {
+            // Add 'loaded' class to the elements in the hero section to trigger the transition
+            document.querySelectorAll('.fade-in').forEach(element => {
+                element.classList.add('loaded');
+            });
+
+            // Select all elements with the class 'card'
+            const cards = document.querySelectorAll('.card');
+
+            // Iterate through all cards and add the 'loaded' class with a delay
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.classList.add('loaded');
+                }, index * 500); // Adjust the delay as needed (500ms in this example)
+            });
+        });
+    </script>
+
+    <script>document.addEventListener("DOMContentLoaded", function () {
+            // Select all anchor tags with hrefs that start with '#'
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault(); // Prevent default anchor behavior
+
+                    // Get the target element by ID
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+
+                    // Check if the element exists
+                    if (targetElement) {
+                        // Get the height of the fixed header
+                        const headerHeight = document.querySelector('header').offsetHeight;
+
+                        // Get the element's position and calculate the scroll position offset by the header height
+                        const elementPosition = targetElement.getBoundingClientRect().top + window.pageYOffset;
+                        const offsetPosition = elementPosition - headerHeight;
+
+                        // Smooth scroll to the calculated position
+                        window.scrollTo({
+                            top: offsetPosition,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+    <script>
+        function toggleCard() {
+            const card = document.getElementById('pay');
+            card.classList.toggle('hidden'); // Show or hide the card
+        }
+    </script>
+    <script>
+        setTimeout(() => location.reload(), 150000);
+    </script>
+
+</head>
+
+<body class="bg-gray-100 transition-opacity delay-500  h-full">
+
+    {% include "includes/messages.html" %}
+    {% include "includes/header.html" %}
+
+
+    {% block layout %}
+
+    {% endblock layout %}
+
+    {% include "includes/footer.html" %}
+
+</body>
+
+</html>
